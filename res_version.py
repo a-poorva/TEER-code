@@ -16,8 +16,8 @@ import os
 import csv
 
 #setting up Arduino pins
-resPin1 = 0
-a.pinMode = (resPin1, a.INPUT)
+VoltPin1 = 0
+a.pinMode = (VoltPin1, a.INPUT)
 
 root = tk.Tk() #making a window called root, refreshes continually so that it updates information
 root.title("ME-555 Controller")
@@ -28,29 +28,29 @@ code_dir = '/home/pi/Documents/'
 
 #function definition
 def Reset():
-    SetRes.set('0')
+    SetVolt.set('0')
 
-def readResistance():
-    root.after(200, readResistance)
-    voltReading1 = a.analogRead(resPin1)
-    voltActual = str(voltReading1 * (5.0 / 1023.0))
-    resistance.set(str(voltActual))
-    fb = open('/home/pi/test2','a+')
-    fb.write()
+def readVoltage():
+    root.after(200, readVoltage)
+    VoltReading1 = a.analogRead(VoltPin1)
+    VoltActual = str(VoltReading1 * (5.0 / 1023.0))
+    Voltage.set(str(VoltActual))
+    fb = open('/home/pi/voltagevalues.txt','a+')
+    fb.write(VoltActual)
     fb.write('\n')
     fb.close()
 
 def SaveValues():
-    SavedSetRes = SetRes.get()
+    SavedSetVolt = SetVolt.get()
     with open(os.path.join(data_dir, 'resistance_values.csv'),'r') as f:
         rows = list(csv.reader(f))
         rows[1][1] = SavedSetRes
         writer = csv.writer(open(os.path.join(data_dir,'resistance_values.csv'), 'w'))
         writer.writerows(rows)
 
-with open(os.path.join(data_dir, 'pressurevalues.csv'), 'r') as f:
+with open(os.path.join(data_dir, 'resistance_values.csv'), 'r') as f:
      rows = list(csv.reader(f)) #reads each row of the csv file like a list
-     SavedSetRes = str(rows[1][1])
+     SavedSetVolt = str(rows[1][1])
 
 #frame definition
 Mainframe = tk.Frame(root) #in tkinter, you're making a frame called Mainframe
@@ -60,24 +60,24 @@ Sidebar.grid(row = 0, column = 3, rowspan=4, columnspan=1)
 
 nb = ttk.Notebook(Mainframe) #a sub-module for tabs and stuff, all located in the Mainframe
 
-#Defining resistance frame in the notebook
-resFrame = ttk.Frame(nb)
-nb.add(resFrame, text = 'Voltage')
-SetResLabel1 = Label(resFrame, text = "Input Voltage:", width = 20)
-SetResLabel1.grid(column=0, row=0) #pack, grid, place: placement line
+#Defining voltage frame in the notebook
+VoltFrame = ttk.Frame(nb)
+nb.add(VoltFrame, text = 'Voltage')
+SetVoltLabel1 = Label(VoltFrame, text = "Input Voltage:", width = 20)
+SetVoltLabel1.grid(column=0, row=0) #pack, grid, place: placement line
 
-SetResLabel2 = Label(resFrame, text = "Recorded Voltage:", width = 20)
-SetResLabel2.grid(column=0, row=1) #pack, grid, place: placement line
+SetVoltLabel2 = Label(VoltFrame, text = "Recorded Voltage:", width = 20)
+SetVoltLabel2.grid(column=0, row=1) #pack, grid, place: placement line
 
-SetRes = StringVar(resFrame,value = SavedSetRes) #initialise
-SetRecResValue = Entry(resFrame, textvariable = SetRes, width = 20)
-SetRecResValue.grid(column=1, row=0) #pack, grid, place: placement line
+SetVolt = StringVar(VoltFrame,value = SavedSetVolt) #initialise
+SetRecVoltValue = Entry(VoltFrame, textvariable = SetVolt, width = 20)
+SetRecVoltValue.grid(column=1, row=0) #pack, grid, place: placement line
 
-resistance = StringVar()
-resistance.set("------")
+Voltage = StringVar()
+Voltage.set("------")
 
-ReadRes1 = Label(resFrame, textvariable = resistance, width = 20,anchor = 'e')
-ReadRes1.grid(column = 1, row = 1)
+ReadVolt1 = Label(VoltFrame, textvariable = Voltage, width = 20,anchor = 'e')
+ReadVolt1.grid(column = 1, row = 1)
 
 nb.pack(expand =1, fill = 'both') #pack, grid, place. Pack puts these options in a particular place
 
@@ -94,11 +94,6 @@ ButtonExit = tk.Button(Sidebar, text = "Reset",
                        command = lambda:Reset()) #lambda is a built in variable that allows#you to call certain functions
 ButtonExit.grid(row =1, column =0)
 
-#Save Button
-ButtonSave = tk.Button(Sidebar, text = 'Save', width = 20,
-                      command = lambda:SaveValues())
-ButtonSave.grid(row = 3, column = 0)
 
-
-root.after(200, readResistance)
+root.after(200, readVoltage)
 root.mainloop()
