@@ -35,15 +35,15 @@ def Reset():
     SetVolt.set('0')
 
 def readVoltage():
-    root.after(5000, readVoltage)
-    VoltReading1 = a.analogRead(VoltPin1)
-    VoltActual = str(VoltReading1 * (5.0 / 1023.0))
-    Voltage.set(str(VoltActual))
-    keep_running = True
+    keepRunning = True
     while keep_running:
+        root.after(5000, readVoltage)
+        VoltReading1 = a.analogRead(VoltPin1)
+        VoltActual = str(VoltReading1 * (5.0 / 1023.0))
+        Voltage.set(str(VoltActual))
         counter = 0
         for counter in range(12)
-            with open(os.path.join(code_dir, 'voltagevalues.txt'),'a+') as f:
+            with open(os.path.join(code_dir, 'voltagevalues.txt'),'a+') as fb:
                 fb.write(VoltActual)
                 fb.write(time.ctime())
                 fb.write('\n')
@@ -53,7 +53,6 @@ def readVoltage():
         if counter > 12:
             keep_running = False
             counter = 0
-    return Voltage
 
 
 def SaveValues():
@@ -111,5 +110,5 @@ ButtonExit = tk.Button(Sidebar, text = "Reset",
 ButtonExit.grid(row =1, column =0)
 
 
-root.after(5000, readVoltage)
+root.after(5000, processVoltage)
 root.mainloop()
