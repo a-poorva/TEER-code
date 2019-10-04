@@ -1,5 +1,5 @@
 from nanpy import(ArduinoApi, SerialManager)
-from time import sleep
+
 #Handshake with arduino
 try:
     print("Trying to make a connection")
@@ -14,6 +14,10 @@ from tkinter import *
 import tkinter as tk
 import os
 import csv
+import schedule
+import time
+from time import sleep
+
 
 #setting up Arduino pins
 VoltPin1 = 0
@@ -31,14 +35,26 @@ def Reset():
     SetVolt.set('0')
 
 def readVoltage():
-    root.after(200, readVoltage)
+    root.after(5000, readVoltage)
     VoltReading1 = a.analogRead(VoltPin1)
     VoltActual = str(VoltReading1 * (5.0 / 1023.0))
     Voltage.set(str(VoltActual))
-    fb = open('/home/pi/voltagevalues.txt','a+')
-    fb.write(VoltActual)
-    fb.write('\n')
-    fb.close()
+    keep_running = True
+    while keep_running:
+        counter = 0
+        for counter in range(12)
+            with open(os.path.join(code_dir, 'voltagevalues.txt'),'a+') as f:
+                fb.write(VoltActual)
+                fb.write(time.ctime())
+                fb.write('\n')
+                fb.close()
+                time.sleep(5)
+        time.sleep(5)
+        if counter > 12:
+            keep_running = False
+            counter = 0
+    return Voltage
+
 
 def SaveValues():
     SavedSetVolt = SetVolt.get()
@@ -66,12 +82,12 @@ nb.add(VoltFrame, text = 'Voltage')
 SetVoltLabel1 = Label(VoltFrame, text = "Input Voltage:", width = 20)
 SetVoltLabel1.grid(column=0, row=0) #pack, grid, place: placement line
 
-SetVoltLabel2 = Label(VoltFrame, text = "Recorded Voltage:", width = 20)
-SetVoltLabel2.grid(column=0, row=1) #pack, grid, place: placement line
-
 SetVolt = StringVar(VoltFrame,value = SavedSetVolt) #initialise
 SetRecVoltValue = Entry(VoltFrame, textvariable = SetVolt, width = 20)
 SetRecVoltValue.grid(column=1, row=0) #pack, grid, place: placement line
+
+SetVoltLabel2 = Label(VoltFrame, text = "Recorded Voltage:", width = 20)
+SetVoltLabel2.grid(column=0, row=1) #pack, grid, place: placement line
 
 Voltage = StringVar()
 Voltage.set("------")
@@ -95,5 +111,5 @@ ButtonExit = tk.Button(Sidebar, text = "Reset",
 ButtonExit.grid(row =1, column =0)
 
 
-root.after(200, readVoltage)
+root.after(5000, readVoltage)
 root.mainloop()
