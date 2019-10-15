@@ -17,55 +17,47 @@ import csv
 import schedule
 import time
 from time import sleep
-
+import random
+import math
 
 #setting up Arduino pins
 VoltPin1 = 0
 a.pinMode = (VoltPin1, a.INPUT)
 
+start_time = time.time()
+
 root = tk.Tk() #making a window called root, refreshes continually so that it updates information
 root.title("ME-555 Controller")
 
 #Get previously stored values
-data_dir = '/home/pi/Documents/Data/'
+data_dir = '/home/pi/Documents/data'
 code_dir = '/home/pi/Documents/'
+
+Voltage = StringVar()
+Voltage.set("------")
 
 #function definition
 def Reset():
     SetVolt.set('0')
 
+def Exit():
+    root.destroy()
+
 def readVoltage():
-    keepRunning = True
-    while keep_running:
-        root.after(5000, readVoltage)
-        VoltReading1 = a.analogRead(VoltPin1)
-        VoltActual = str(VoltReading1 * (5.0 / 1023.0))
-        Voltage.set(str(VoltActual))
-        counter = 0
-        for counter in range(12)
-            with open(os.path.join(code_dir, 'voltagevalues.txt'),'a+') as fb:
-                fb.write(VoltActual)
-                fb.write(time.ctime())
-                fb.write('\n')
-                fb.close()
-                time.sleep(5)
-        time.sleep(5)
-        if counter > 12:
-            keep_running = False
-            counter = 0
-
-
-def SaveValues():
-    SavedSetVolt = SetVolt.get()
-    with open(os.path.join(data_dir, 'resistance_values.csv'),'r') as f:
-        rows = list(csv.reader(f))
-        rows[1][1] = SavedSetRes
-        writer = csv.writer(open(os.path.join(data_dir,'resistance_values.csv'), 'w'))
-        writer.writerows(rows)
-
-with open(os.path.join(data_dir, 'resistance_values.csv'), 'r') as f:
-     rows = list(csv.reader(f)) #reads each row of the csv file like a list
-     SavedSetVolt = str(rows[1][1])
+    for counter in range (1,12):
+        with open(os.path.join(code_dir, 'voltagevalues.txt'),'a+') as fb:
+            VoltReading1 = a.analogRead(VoltPin1)
+            VoltActual = str(VoltReading1 * (5.0 / 1023.0))
+            Voltage.set(str(VoltActual))
+            elapsed_time = time.time() - start_time
+            fb.write('\n')
+            fb.write("Voltage is: ")
+            fb.write(str(VoltActual))
+            fb.write(', ')
+            fb.write(str("Time:"))
+            fb.write(str(elapsed_time))
+            time.sleep(5)
+    root.after(5000, readVoltage)
 
 #frame definition
 Mainframe = tk.Frame(root) #in tkinter, you're making a frame called Mainframe
@@ -78,18 +70,16 @@ nb = ttk.Notebook(Mainframe) #a sub-module for tabs and stuff, all located in th
 #Defining voltage frame in the notebook
 VoltFrame = ttk.Frame(nb)
 nb.add(VoltFrame, text = 'Voltage')
+
 SetVoltLabel1 = Label(VoltFrame, text = "Input Voltage:", width = 20)
 SetVoltLabel1.grid(column=0, row=0) #pack, grid, place: placement line
 
-SetVolt = StringVar(VoltFrame,value = SavedSetVolt) #initialise
+SetVolt = StringVar(VoltFrame,value = 1) #initialise
 SetRecVoltValue = Entry(VoltFrame, textvariable = SetVolt, width = 20)
 SetRecVoltValue.grid(column=1, row=0) #pack, grid, place: placement line
 
 SetVoltLabel2 = Label(VoltFrame, text = "Recorded Voltage:", width = 20)
 SetVoltLabel2.grid(column=0, row=1) #pack, grid, place: placement line
-
-Voltage = StringVar()
-Voltage.set("------")
 
 ReadVolt1 = Label(VoltFrame, textvariable = Voltage, width = 20,anchor = 'e')
 ReadVolt1.grid(column = 1, row = 1)
@@ -110,5 +100,5 @@ ButtonExit = tk.Button(Sidebar, text = "Reset",
 ButtonExit.grid(row =1, column =0)
 
 
-root.after(5000, processVoltage)
+root.after(5000, readVoltage)
 root.mainloop()
