@@ -51,10 +51,8 @@ def readVoltage():
             Voltage.set(str(VoltActual))
             elapsed_time = time.time() - start_time
             fb.write('\n')
-            fb.write("Voltage is: ")
             fb.write(str(VoltActual))
-            fb.write(', ')
-            fb.write(str("Time:"))
+            fb.write(' ')
             fb.write(str(elapsed_time))
             time.sleep(5)
     root.after(5000, readVoltage)
